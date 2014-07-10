@@ -22,6 +22,8 @@
     function MenbibNodeConfig(selector, url) {
         // Initialization code
         var self = this;
+        self.selector = selector;
+        self
         self.viewModel = new ViewModel(url);
         $.osf.applyBindings(self.viewModel, selector);
     }
