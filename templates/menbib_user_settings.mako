@@ -2,7 +2,7 @@
 
 <div id='menbibAddonScope' class='addon-settings scripted'>
     <h4 class='addon-title'>
-        MendeleyBibliography
+        Mendeley
 
         <small class="authorized-by">
                  <!-- Delete Access Token Button -->
@@ -16,7 +16,7 @@
             </span>
                  <!-- Create Access Token Button -->
             <span data-bind="if: !userHasAuth() && loaded()">
-                <a data-bind="attr: {href: urls().create}" class="text-primart pull-right"
+                <a data-bind="attr: {href: urls().create}" class="text-primary pull-right"
                    style="margin-top:4.8px">
                     Create Access Token
                 </a>
@@ -35,6 +35,6 @@
         // Endpoint for menbib user settings
         var url = '/api/v1/settings/menbib/';
         // Start up the MendeleyBibliography Config manager
-        var menbib = new MendeleyBibilographyUserConfig('#menbibAddonScope', url);
+        var menbib = new MenbibUserConfig('#menbibAddonScope', url);
     });
 </script>
