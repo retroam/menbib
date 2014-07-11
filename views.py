@@ -14,9 +14,11 @@ from framework.exceptions import HTTPError
 from framework.status import push_status_message as flash
 from requests_oauthlib import OAuth2Session
 from . import settings as menbib_settings
+from collections import namedtuple
+from website.project.model import Node
 
-OAUTH_AUTHORIZE_URL = 'https://api-oauth2.mendeley.com/oauth/authorize'
-OAUTH_ACCESS_TOKEN_URL = 'https://api-oauth2.mendeley.com/oauth/token'
+OAUTH_AUTHORIZE_URL = 'https://api.mendeley.com/oauth/authorize'
+OAUTH_ACCESS_TOKEN_URL = 'https://api.mendeley.com/oauth/token'
 
 
 def get_auth_flow():
@@ -29,6 +31,31 @@ def get_auth_flow():
     authorization_url, state = session.authorization_url(OAUTH_AUTHORIZE_URL)
     return authorization_url
 
+AuthResult = namedtuple('AuthResult',
+                        ['access_token', 'refresh_token',
+                         'token_type', 'expires_in'])
+
+
+def finish_auth(**kwargs):
+    code = request.args.get('code')
+    if code is None:
+        raise HTTPError(http.BAD_REQUEST)
+
+    redirect_uri = api_url_for('menbib_oauth_finish', _absolute=True)
+
+    oauth_session = OAuth2Session(
+        client_id=menbib_settings.CLIENT_ID,
+        redirect_uri=redirect_uri,
+    )
+
+    token = oauth_session.fetch_token(
+        OAUTH_ACCESS_TOKEN_URL,
+        client_secret=menbib_settings.CLIENT_SECRET,
+        code=code,
+    )
+
+    return AuthResult(token['access_token'], token['refresh_token']
+                      , token['token_type'], token['expires_in'])
 
 def menbib_oauth_start(**kwargs):
     user = get_current_user()
@@ -45,8 +72,24 @@ def menbib_oauth_start(**kwargs):
 
 
 
-def menbib_oauth_finish():
-    return {}
+def menbib_oauth_finish(**kwargs):
+    user = get_current_user()
+    if not user:
+        raise HTTPError(http.FORBIDDEN)
+    node = Node.load(session.data.get('menbib_auth_nid'))
+    result = finish_auth()
+
+    user.add_addon('menbib')
+    user.save()
+    user_settings = user.get_addon('mendeley')
+
+    user_settings.owner = user
+    user_settings.access_token = result.access_token
+    user_settings.refresh_token = result.refresh_token
+    user_settings.token_type = result.token_type
+    user_settings.expires_in = result.expires_in
+
+    return redirect(web_url_for('user_addons'))
 
 
 def menbib_oauth_delete_user():
