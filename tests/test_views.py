@@ -22,3 +22,8 @@ class TestMenbibViews(OsfTestCase):
         url = api_url_for('menbib_oauth_start_user')
         res = self.app.get(url)
         assert_is_redirect(res)
+
+    def test_menbib_oauth_finish(self):
+        url = api_url_for('menbib_oauth_finish')
+        res = self.app.get(url)
+        assert_is_redirect(res)

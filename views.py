@@ -15,14 +15,19 @@ from framework.status import push_status_message as flash
 from requests_oauthlib import OAuth2Session
 from . import settings as menbib_settings
 
+OAUTH_AUTHORIZE_URL = 'https://api-oauth2.mendeley.com/oauth/authorize'
+OAUTH_ACCESS_TOKEN_URL = 'https://api-oauth2.mendeley.com/oauth/token'
+
 
 def get_auth_flow():
     redirect_uri = api_url_for('menbib_oauth_finish', _absolute=True)
-    return OAuth2Session(
+    session =  OAuth2Session(
         menbib_settings.CLIENT_ID,
         redirect_uri=redirect_uri,
         scope=menbib_settings.SCOPE,
     )
+    authorization_url, state = session.authorization_url(OAUTH_AUTHORIZE_URL)
+    return authorization_url
 
 
 def menbib_oauth_start(**kwargs):
@@ -35,6 +40,7 @@ def menbib_oauth_start(**kwargs):
     if user.has_addon('menbib') and user.get_addon('menbib').has_auth:
         flash('You have already authorized Mendeley for this account', 'warning')
         return redirect(web_url_for('user_addons'))
+
     return redirect(get_auth_flow())
 
 
