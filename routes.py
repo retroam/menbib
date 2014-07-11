@@ -7,34 +7,53 @@ from website.routes import OsfWebRenderer
 
 from . import views
 
-# Routes that use the web renderer
-web_routes = {
+settings_routes = {
     'rules': [
+        ##### User Settings #####
+        Rule(
+            '/settings/menbib/',
+            'get',
+            views.menbib_user_config_get,
+            json_renderer,
+        ),
 
-        ##### View file #####
-    #     Rule(
-    #         [
-    #             '/project/<pid>/menbib/files/<path:path>',
-    #             '/project/<pid>/node/<nid>/menbib/files/<path:path>',
-    #         ],
-    #         'get',
-    #         views.crud.menbib_view_file,
-    #         OsfWebRenderer('../addons/menbib/templates/menbib_view_file.mako'),
-    #     ),
+        ##### OAuth #####
+        Rule(
+            '/settings/menbib/oauth/',
+            'get',
+            views.menbib_oauth_start,  # Use same view func as node oauth start
+            json_renderer,
+            endpoint_suffix='_user'          # but add a suffix for url_for
+        ),
 
+        Rule(
+            '/addons/menbib/oauth/finish/',
+            'get',
+            views.menbib_oauth_finish,
+            json_renderer,
+        ),
 
-    #     ##### Download file #####
-    #     Rule(
-    #         [
-    #             '/project/<pid>/menbib/files/<path:path>/download/',
-    #             '/project/<pid>/node/<nid>/menbib/files/<path:path>/download/',
-    #         ],
-    #         'get',
-    #         views.crud.menbib_download,
-    #         notemplate,
-    #     ),
+        Rule(
+            '/settings/menbib/oauth/',
+            'delete',
+            views.menbib_oauth_delete_user,
+            json_renderer,
+        ),
+
+        Rule(
+            [
+                '/project/<pid>/menbib/oauth/',
+                '/project/<pid>/node/<nid>/menbib/oauth/',
+            ],
+            'get',
+            views.menbib_oauth_start,
+            json_renderer,
+        ),
     ],
+    'prefix': '/api/v1'
 }
+
+
 
 # JSON endpoints
 api_routes = {

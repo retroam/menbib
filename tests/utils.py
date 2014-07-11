@@ -10,17 +10,16 @@ app = website.app.init_app(
     routes=True, set_backends=False, settings_module='website.settings'
 )
 
+
 class MenbibAddonTestCase(AddonTestCase):
 
-    ADDON_SHORT_NAME = menbib
+    ADDON_SHORT_NAME = 'menbib'
 
     def create_app(self):
         return TestApp(app)
 
     def set_user_settings(self, settings):
-        # Any user settings model setup here
-        # ...
+        return {}
 
     def set_node_settings(self, settings):
-        # Any node settings model setup here
-        # ...
+        return {}

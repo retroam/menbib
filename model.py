@@ -11,7 +11,8 @@ class AddonMenbibUserSettings(AddonUserSettingsBase):
     token.
     """
     access_token = fields.StringField(required=False)
-    # TODO
+    menbib_info = fields.StringField(required=False)
+
 
     @property
     def has_auth(self):

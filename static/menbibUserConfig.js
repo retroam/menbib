@@ -7,10 +7,12 @@
         define(['knockout', 'jquery', 'osfutils', 'knockoutpunches', 'language'], factory);
     } else {
         global.MenbibUserConfig  = factory(ko, jQuery);
+
     }
 }(this, function(ko, $) {
     // Enable knockout punches
     ko.punches.enableAll();
+
 
     var language = $.osf.Language.Addons.mendeley;
 

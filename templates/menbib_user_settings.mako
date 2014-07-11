@@ -3,10 +3,12 @@
 <div id='menbibAddonScope' class='addon-settings scripted'>
     <h4 class='addon-title'>
         Mendeley
-
+         <!-- <pre data-bind="text: ko.toJSON($data, null, 2)"></pre> -->
+        <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>
         <small class="authorized-by">
                  <!-- Delete Access Token Button -->
-            <span data-bind="if: userHasAuth && loaded()">
+
+            <span data-bind="if: userHasAuth() && loaded()">
                 authorized
                 <span data-bind="if: menbibName()"> by {{ menbibName }} </span>
                 <a data-bind="click: deleteKey" class="text-danger pull-right"
@@ -38,3 +40,5 @@
         var menbib = new MenbibUserConfig('#menbibAddonScope', url);
     });
 </script>
+
+<%include file="profile/addon_permissions.mako" />
