@@ -23,12 +23,12 @@ OAUTH_ACCESS_TOKEN_URL = 'https://api.mendeley.com/oauth/token'
 
 def get_auth_flow():
     redirect_uri = api_url_for('menbib_oauth_finish', _absolute=True)
-    session =  OAuth2Session(
+    oauth_session = OAuth2Session(
         menbib_settings.CLIENT_ID,
         redirect_uri=redirect_uri,
         scope=menbib_settings.SCOPE,
     )
-    authorization_url, state = session.authorization_url(OAUTH_AUTHORIZE_URL)
+    authorization_url, state = oauth_session.authorization_url(OAUTH_AUTHORIZE_URL)
     return authorization_url
 
 AuthResult = namedtuple('AuthResult',
@@ -37,8 +37,8 @@ AuthResult = namedtuple('AuthResult',
 
 
 def finish_auth(**kwargs):
-    code = request.args.get('code')
-    if code is None:
+    access_code = request.args.get('code')
+    if access_code is None:
         raise HTTPError(http.BAD_REQUEST)
 
     redirect_uri = api_url_for('menbib_oauth_finish', _absolute=True)
@@ -46,16 +46,18 @@ def finish_auth(**kwargs):
     oauth_session = OAuth2Session(
         client_id=menbib_settings.CLIENT_ID,
         redirect_uri=redirect_uri,
+        scope=menbib_settings.SCOPE,
     )
 
     token = oauth_session.fetch_token(
         OAUTH_ACCESS_TOKEN_URL,
         client_secret=menbib_settings.CLIENT_SECRET,
-        code=code,
+        code=access_code,
     )
 
     return AuthResult(token['access_token'], token['refresh_token']
                       , token['token_type'], token['expires_in'])
+
 
 def menbib_oauth_start(**kwargs):
     user = get_current_user()
@@ -77,7 +79,7 @@ def menbib_oauth_finish(**kwargs):
     if not user:
         raise HTTPError(http.FORBIDDEN)
     node = Node.load(session.data.get('menbib_auth_nid'))
-    result = finish_auth()
+    result = finish_auth(**kwargs)
 
     user.add_addon('menbib')
     user.save()
