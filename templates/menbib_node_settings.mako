@@ -1,5 +1,7 @@
 
+
 <div id="menbibScope" class="scripted">
+    <pre data-bind="text: ko.toJSON($data, null, 2)"></pre>
     <h4 class="addon-title">
         Mendeley
         <small class="authorized-by">
