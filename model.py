@@ -11,6 +11,9 @@ class AddonMenbibUserSettings(AddonUserSettingsBase):
     token.
     """
     access_token = fields.StringField(required=False)
+    refresh_token = fields.StringField(required=False)
+    token_type = fields.StringField(required=False)
+    expires_in = fields.StringField(required=False)
     menbib_info = fields.StringField(required=False)
 
 
