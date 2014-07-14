@@ -1,6 +1,6 @@
 # Mendeley application credentials
 CLIENT_ID = '637'
-CLIENT_SECRET = 'XnxZULsC8gyxmBaL'
+CLIENT_SECRET = 'iAc546o0eCnSrpna'
 
 # Mendeley access scope
 SCOPE = ['all']

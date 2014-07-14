@@ -2,10 +2,7 @@
  * Module that controls the MendeleyBibliography node settings. Includes Knockout view-model
  * for syncing data.
  */
-/**
- * Module that controls the Dropbox node settings. Includes Knockout view-model
- * for syncing data, and HGrid-folderpicker for selecting a folder.
- */
+
 
 
 ;(function (global, factory) {
@@ -15,7 +12,7 @@
     } else if (typeof $script === 'function') {
         $script.ready(['folderPicker', 'zeroclipboard'], function() {
             global.MenbibNodeConfig  = factory(ko, jQuery, FolderPicker, ZeroClipboard);
-            $script.done('figshareNodeConfig');
+            $script.done('menbibNodeConfig');
         });
     } else {
         global.MenbibNodeConfig  = factory(ko, jQuery, FolderPicker, ZeroClipboard);
@@ -24,7 +21,7 @@
     'use strict';
     ko.punches.attributeInterpolationMarkup.enable();
     /**
-     * Knockout view model for the Figshare node settings widget.
+     * Knockout view model for the Mendeley node settings widget.
      */
     var ViewModel = function(url, selector, folderPicker) {
         var self = this;
@@ -76,7 +73,7 @@
                 },
                 error: function(xhr, textStatus, error) {
                     console.error(textStatus); console.error(error);
-                    self.changeMessage('Could not retrieve Figshare settings at ' +
+                    self.changeMessage('Could not retrieve Mendeley settings at ' +
                         'this time. Please refresh ' +
                         'the page. If the problem persists, email ' +
                         '<a href="mailto:support@cos.io">support@cos.io</a>.',
@@ -150,7 +147,7 @@
         }
 
         /**
-         * Send a PUT request to change the linked Figshare folder.
+         * Send a PUT request to change the linked Mendeley folder.
          */
         self.submitSettings = function() {
             $.osf.putJSON(self.urls().config, ko.toJS(self),
@@ -191,7 +188,7 @@
                     self.nodeHasAuth(false);
                     self.cancelSelection();
                     self.currentDisplay(null);
-                    self.changeMessage('Deauthorized Figshare.', 'text-warning', 3000);
+                    self.changeMessage('Deauthorized Mendeley.', 'text-warning', 3000);
                 },
                 error: function() {
                     self.changeMessage('Could not deauthorize because of an error. Please try again later.',
@@ -200,13 +197,13 @@
             });
         }
 
-        /** Pop up a confirmation to deauthorize Figshare from this node.
+        /** Pop up a confirmation to deauthorize Mendeley from this node.
          *  Send DELETE request if confirmed.
          */
         self.deauthorize = function() {
             bootbox.confirm({
-                title: 'Deauthorize Figshare?',
-                message: 'Are you sure you want to remove this Menbib authorization?',
+                title: 'Deauthorize Mendeley?',
+                message: 'Are you sure you want to remove this Mendeley authorization?',
                 callback: function(confirmed) {
                     if (confirmed) {
                         return sendDeauth();

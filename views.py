@@ -79,17 +79,27 @@ def menbib_oauth_finish(**kwargs):
     if not user:
         raise HTTPError(http.FORBIDDEN)
     node = Node.load(session.data.get('menbib_auth_nid'))
-    result = finish_auth(**kwargs)
+    result = finish_auth()
 
     user.add_addon('menbib')
     user.save()
-    user_settings = user.get_addon('mendeley')
-
+    user_settings = user.get_addon('menbib')
     user_settings.owner = user
     user_settings.access_token = result.access_token
     user_settings.refresh_token = result.refresh_token
     user_settings.token_type = result.token_type
     user_settings.expires_in = result.expires_in
+    user_settings.save()
+
+    flash('Successfully authorized Mendeley', 'success')
+
+    if node:
+        del session.data['menbib_auth_nid']
+        if node.has_addon('menbib'):
+            node_addon = node.get_addon('menbib')
+            node_addon.set_user_auth(user_settings)
+            node_addon.save()
+        return redirect(node.web_url_for('node_setting'))
 
     return redirect(web_url_for('user_addons'))
 

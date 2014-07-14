@@ -100,6 +100,6 @@
     $script(['/static/addons/menbib/menbibNodeConfig.js']);
     $script.ready('menbibNodeConfig', function() {
         var url = '${node["api_url"] + "menbib/config/"}';
-        var menbib = new MenbibNodeConfig('#menbibScope', url, '#menbibGrid');
+        var menbib = new MenbibNodeConfig('#menbibScope',url, '#menbibGrid');
     });
 </script>
