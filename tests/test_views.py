@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 from webtest_plus import TestApp
 from nose.tools import *  # PEP8 asserts
-
+import mock
 from tests.base import OsfTestCase, URLLookup, assert_is_redirect
 from tests.factories import AuthUserFactory
 from website.util import api_url_for
-
+from collections import namedtuple
 
 from .utils import app, MenbibAddonTestCase
 
 lookup = URLLookup(app)
+AuthResult = namedtuple('AuthResult',
+                        ['access_token', 'refresh_token',
+                         'token_type', 'expires_in'])
 
 class TestMenbibViews(OsfTestCase):
 
@@ -23,7 +26,9 @@ class TestMenbibViews(OsfTestCase):
         res = self.app.get(url)
         assert_is_redirect(res)
 
-    def test_menbib_oauth_finish(self):
+    @mock.patch('website.addons.menbib.views.finish_auth')
+    def test_menbib_oauth_finish(self, mock_finish):
+        mock_finish.return_value = AuthResult('mytokenabc', 'myrefreshabc', 'cool', '3600')
         url = api_url_for('menbib_oauth_finish')
         res = self.app.get(url)
         assert_is_redirect(res)
