@@ -33,9 +33,9 @@ class AddonMenbibUserSettings(AddonUserSettingsBase):
 
     def clear(self):
         self.access_token = None
-        # for node_settings in self.addonmenbibnodesettings_authorized:
-        #     node_settings.deauthorize(Auth(self.owner))
-        #     node_settings.save()
+        for node_settings in self.addonmenbibnodesettings_authorized:
+            node_settings.deauthorize(Auth(self.owner))
+            node_settings.save()
         return self
 
 
@@ -117,19 +117,25 @@ class AddonMenbibNodeSettings(AddonNodeSettingsBase):
         """Return warning text to display if user auth will be copied to a
         fork.
         """
-        # TODO
-        pass
+        category = node.project_or_component
+        if self.user_settings and self.user_settings.owner == user:
+            return ('Because you have authorized the Mendely add-on for this {category},'
+                    'forking it will not transfer authentication to {category}').format(category=category)
 
     # backwards compatibility
     before_fork = before_fork_message
 
     def before_remove_contributor_message(self, node, removed):
         """Return warning text to display if removed contributor is the user
-        who authorized the Menbib addon
+        who authorized the Mendeley addon
         """
         if self.user_settings and self.user_settings.owner == removed:
-            # TODO
-            pass
+            category = node.project_or_component
+            name = removed.fullname
+            return ('The Mendeley add-on for this {category} is authenticated by {name}. '
+                    'Removing this user will also remove write access to Mendeley '
+                    'unless another contributor re-authenticates the add-on.'
+                    ).format(**locals())
 
     # backwards compatibility
     before_remove_contributor = before_remove_contributor_message
@@ -140,7 +146,7 @@ class AddonMenbibNodeSettings(AddonNodeSettingsBase):
 
         :return: A tuple of the form (cloned_settings, message)
         """
-        clone, message = super(MenbibNodeSettings, self).after_register(
+        clone, message = super(AddonMenbibNodeSettings, self).after_register(
             node, registration, user, save=False
         )
         # Copy user_settings and add registration data
@@ -157,15 +163,15 @@ class AddonMenbibNodeSettings(AddonNodeSettingsBase):
 
         :return: A tuple of the form (cloned_settings, message)
         """
-        clone, _ = super(MenbibNodeSettings, self).after_fork(
+        clone, _ = super(AddonMenbibNodeSettings, self).after_fork(
             node=node, fork=fork, user=user, save=False
         )
 
         if self.user_settings and self.user_settings.owner == user:
             clone.user_settings = self.user_settings
-            message = 'MendeleyBibliography authorization copied to fork.'
+            message = 'Mendeley authorization copied to fork.'
         else:
-            message = ('MendeleyBibliography authorization not copied to fork. You may '
+            message = ('Mendeley authorization not copied to fork. You may '
                         'authorize this fork on the <a href="{url}">Settings</a>'
                         'page.').format(
                         url=fork.web_url_for('node_setting'))

@@ -159,53 +159,53 @@ class TestMenbibNodeSettingsModel(OsfTestCase):
         #assert_equal(log_params['folder'], node_settings.folder)
         assert_equal(log_params['node'], node_settings.owner._primary_key)
         assert_equal(last_log.user, user_settings.owner)
-#
-#
-# class TestNodeSettingsCallbacks(OsfTestCase):
-#
-#     def setUp(self):
-#         # Create node settings with auth
-#         self.user_settings = DropboxUserSettingsFactory(access_token='123abc')
-#         self.node_settings = DropboxNodeSettingsFactory(user_settings=self.user_settings,
-#             folder='')
-#
-#         self.project = self.node_settings.owner
-#         self.user = self.user_settings.owner
-#
-#     def test_after_fork_by_authorized_dropbox_user(self):
-#         fork = ProjectFactory()
-#         clone, message = self.node_settings.after_fork(
-#             node=self.project, fork=fork, user=self.user_settings.owner
-#         )
-#         assert_equal(clone.user_settings, self.user_settings)
-#
-#     def test_after_fork_by_unauthorized_dropbox_user(self):
-#         fork = ProjectFactory()
-#         user = UserFactory()
-#         clone, message = self.node_settings.after_fork(
-#             node=self.project, fork=fork, user=user,
-#             save=True
-#         )
-#         # need request context for url_for
-#         assert_is(clone.user_settings, None)
-#
-#     def test_before_fork(self):
-#         node = ProjectFactory()
-#         message = self.node_settings.before_fork(node, self.user)
-#         assert_true(message)
-#
-#     def test_before_remove_contributor_message(self):
-#         message = self.node_settings.before_remove_contributor(
-#             self.project, self.user)
-#         assert_true(message)
-#         assert_in(self.user.fullname, message)
-#         assert_in(self.project.project_or_component, message)
-#
-#     def test_after_remove_authorized_dropbox_user(self):
-#         message = self.node_settings.after_remove_contributor(
-#             self.project, self.user_settings.owner)
-#         self.node_settings.save()
-#         assert_is_none(self.node_settings.user_settings)
-#         assert_true(message)
-#
-#
+
+
+class TestNodeSettingsCallbacks(OsfTestCase):
+
+    def setUp(self):
+        # Create node settings with auth
+        self.user_settings = MenbibUserSettingsFactory(access_token='123abc')
+        self.node_settings = MenbibNodeSettingsFactory(user_settings=self.user_settings,
+            folder='')
+
+        self.project = self.node_settings.owner
+        self.user = self.user_settings.owner
+
+    def test_after_fork_by_authorized_mendeley_user(self):
+        fork = ProjectFactory()
+        clone, message = self.node_settings.after_fork(
+            node=self.project, fork=fork, user=self.user_settings.owner
+        )
+        assert_equal(clone.user_settings, self.user_settings)
+
+    def test_after_fork_by_unauthorized_mendeley_user(self):
+        fork = ProjectFactory()
+        user = UserFactory()
+        clone, message = self.node_settings.after_fork(
+            node=self.project, fork=fork, user=user,
+            save=True
+        )
+        # need request context for url_for
+        assert_is(clone.user_settings, None)
+
+    def test_before_fork(self):
+        node = ProjectFactory()
+        message = self.node_settings.before_fork(node, self.user)
+        assert_true(message)
+
+    def test_before_remove_contributor_message(self):
+        message = self.node_settings.before_remove_contributor(
+            self.project, self.user)
+        assert_true(message)
+        assert_in(self.user.fullname, message)
+        assert_in(self.project.project_or_component, message)
+
+    def test_after_remove_authorized_mendeley_user(self):
+        message = self.node_settings.after_remove_contributor(
+            self.project, self.user_settings.owner)
+        self.node_settings.save()
+        assert_is_none(self.node_settings.user_settings)
+        assert_true(message)
+
+
