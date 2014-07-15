@@ -42,62 +42,29 @@ class TestUserSettingsModel(OsfTestCase):
         user_settings.access_token = '12345'
         user_settings.save()
         assert_true(user_settings.has_auth)
-    #
-    # def test_clear_clears_associated_node_settings(self):
-    #     node_settings = DropboxNodeSettingsFactory.build()
-    #     user_settings = DropboxUserSettingsFactory()
-    #     node_settings.user_settings = user_settings
-    #     node_settings.save()
-    #
-    #     user_settings.clear()
-    #     user_settings.save()
-    #
-    #     # Node settings no longer associated with user settings
-    #     assert_is(node_settings.user_settings, None)
-    #     assert_is(node_settings.folder, None)
-    #
-    # def test_clear(self):
-    #     node_settings = DropboxNodeSettingsFactory.build()
-    #     user_settings = DropboxUserSettingsFactory(access_token='abcde',
-    #         dropbox_id='abc')
-    #     node_settings.user_settings = user_settings
-    #     node_settings.save()
-    #
-    #     assert_true(user_settings.access_token)
-    #     user_settings.clear()
-    #     user_settings.save()
-    #     assert_false(user_settings.access_token)
-    #     assert_false(user_settings.dropbox_id)
-    #
-    # def test_delete(self):
-    #     user_settings = DropboxUserSettingsFactory()
-    #     assert_true(user_settings.has_auth)
-    #     user_settings.delete()
-    #     user_settings.save()
-    #     assert_false(user_settings.access_token)
-    #     assert_false(user_settings.dropbox_id)
-    #     assert_true(user_settings.deleted)
-    #
-    # def test_delete_clears_associated_node_settings(self):
-    #     node_settings = DropboxNodeSettingsFactory.build()
-    #     user_settings = DropboxUserSettingsFactory()
-    #     node_settings.user_settings = user_settings
-    #     node_settings.save()
-    #
-    #     old_logs = node_settings.owner.logs
-    #
-    #     user_settings.delete()
-    #     user_settings.save()
-    #
-    #     # Node settings no longer associated with user settings
-    #     assert_is(node_settings.user_settings, None)
-    #     assert_is(node_settings.folder, None)
-    #     assert_false(node_settings.deleted)
-    #
-    # def test_to_json(self):
-    #     user_settings = DropboxUserSettingsFactory()
-    #     result = user_settings.to_json()
-    #     assert_equal(result['has_auth'], user_settings.has_auth)
+
+    def test_clear(self):
+        node_settings = MenbibNodeSettingsFactory.build()
+        user_settings = MenbibUserSettingsFactory(access_token='abcde')
+        node_settings.user_settings = user_settings
+        node_settings.save()
+
+        assert_true(user_settings.access_token)
+        user_settings.clear()
+        user_settings.save()
+        assert_false(user_settings.access_token)
+
+    def test_delete(self):
+        user_settings = MenbibUserSettingsFactory(access_token='abcde')
+        assert_true(user_settings.has_auth)
+        user_settings.delete()
+        user_settings.save()
+        assert_false(user_settings.access_token)
+
+    def test_to_json(self):
+        user_settings = MenbibUserSettingsFactory()
+        result = user_settings.to_json()
+        assert_equal(result['has_auth'], user_settings.has_auth)
 
 
 # class TestDropboxNodeSettingsModel(OsfTestCase):

@@ -32,3 +32,16 @@ class TestMenbibViews(OsfTestCase):
         url = api_url_for('menbib_oauth_finish')
         res = self.app.get(url)
         assert_is_redirect(res)
+
+    def test_menbib_oauth_delete_user(self):
+        self.user.add_addon('menbib')
+        user_settings = self.user.get_addon('menbib')
+        user_settings.access_token = '12345abc'
+        user_settings.save()
+        assert_true(user_settings.has_auth)
+        self.user.save()
+        url = api_url_for('menbib_oauth_delete_user')
+        res = self.app.delete(url)
+        print res
+        # user_settings.reload()
+        # assert_false(user_settings.has_auth)

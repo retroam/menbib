@@ -4,6 +4,7 @@
 
 from modularodm import fields
 from website.addons.base import AddonUserSettingsBase, AddonNodeSettingsBase
+from framework.auth import Auth
 
 
 class AddonMenbibUserSettings(AddonUserSettingsBase):
@@ -21,21 +22,59 @@ class AddonMenbibUserSettings(AddonUserSettingsBase):
     def has_auth(self):
         return bool(self.access_token)
 
+    def to_json(self, user=None):
+        output = super(AddonMenbibUserSettings, self).to_json(self.owner)
+        output['has_auth'] = self.has_auth
+        return output
+
+    def delete(self, save=True):
+        self.clear()
+        super(AddonMenbibUserSettings, self).delete(save)
+
+    def clear(self):
+        self.access_token = None
+        # for node_settings in self.addonmenbibnodesettings_authorized:
+        #     node_settings.deauthorize(Auth(self.owner))
+        #     node_settings.save()
+        return self
+
 
 class AddonMenbibNodeSettings(AddonNodeSettingsBase):
 
     user_settings = fields.ForeignField(
-        'menbibusersettings', backref='authorized'
+        'addonmenbibusersettings', backref='authorized'
     )
+    folder = fields.StringField(default=None)
 
     @property
     def has_auth(self):
         """Whether an access token is associated with this node."""
         return bool(self.user_settings and self.user_settings.has_auth)
 
+    def set_user_auth(self, user_settings):
+        node = self.owner
+        self.user_settings = user_settings
+        node.add_log(
+            action='menbib_node_authorized',
+            auth=Auth(user_settings.owner),
+            params={
+                'project': node.parent_id,
+                'node': node._primary_key,
+            }
+        )
+
+    def set_folder(self, folder, auth):
+        node = self.owner
+        self.folder = folder
+        node.add_log(
+            action='folder_selected',
+            save=True,
+        )
+
+
     def deauthorize(self, auth):
         """Remove user authorization from this node and log the event."""
-        # TODO: Any other addon-specific settings should be removed here.
+
         node = self.owner
         self.user_settings = None
         self.owner.add_log(
@@ -131,7 +170,7 @@ class AddonMenbibNodeSettings(AddonNodeSettingsBase):
             self.save()
             name = removed.fullname
             url = node.web_url_for('node_setting')
-            return ('Because the MendeleyBibliography add-on for this project was authenticated'
+            return ('Because the Mendeley add-on for this project was authenticated'
                     'by {name}, authentication information has been deleted. You '
                     'can re-authenticate on the <a href="{url}">Settings</a> page'
                     ).format(**locals())

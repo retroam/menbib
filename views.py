@@ -103,9 +103,12 @@ def menbib_oauth_finish(**kwargs):
 
     return redirect(web_url_for('user_addons'))
 
-
-def menbib_oauth_delete_user():
-    return {}
+@must_be_logged_in
+@must_have_addon('menbib', 'user')
+def menbib_oauth_delete_user(user_addon):
+    user_addon.clear()
+    user_addon.save()
+    return None
 
 @must_be_valid_project
 @must_have_addon('menbib', 'node')
