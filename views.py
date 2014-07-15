@@ -105,7 +105,7 @@ def menbib_oauth_finish(**kwargs):
 
 @must_be_logged_in
 @must_have_addon('menbib', 'user')
-def menbib_oauth_delete_user(user_addon):
+def menbib_oauth_delete_user(user_addon, auth, **kwargs):
     user_addon.clear()
     user_addon.save()
     return None
