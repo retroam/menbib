@@ -92,9 +92,21 @@ api_routes = {
             views.menbib_import_user_auth,
             json_renderer
         ),
+
+           ##### HGrid #####
+        Rule(
+            [
+                '/project/<pid>/menbib/hgrid/',
+                '/project/<pid>/node/<nid>/menbib/hgrid/',
+                '/project/<pid>/menbib/hgrid/<path:path>',
+                '/project/<pid>/node/<nid>/menbib/hgrid/<path:path>',
+            ],
+            'get',
+            views.menbib_hgrid_data_contents,
+            json_renderer
+        ),
     ],
 
-    ## Your routes here
 
     'prefix': '/api/v1'
 }

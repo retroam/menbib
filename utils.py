@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Utility functions for the MendeleyBibliography add-on.
 """
+from website.util import web_url_for
+
 
 def serialize_urls(node_settings):
     node = node_settings.owner
@@ -8,7 +10,8 @@ def serialize_urls(node_settings):
         'config': node.api_url_for('menbib_config_put'),
         'deauthorize': node.api_url_for('menbib_deauthorize'),
         'auth': node.api_url_for('menbib_oauth_start'),
-        'importAuth': node.api_url_for('menbib_import_user_auth')
+        'importAuth': node.api_url_for('menbib_import_user_auth'),
+        'folders': node.api_url_for('menbib_hgrid_data_contents')
     }
     return urls
 
@@ -30,7 +33,15 @@ def serialize_settings(node_settings, current_user):
     }
     if node_settings.has_auth:
     # Add owner's profile URL
-        result['urls']['owner'] = web_url_for('profile_view_id',
+        rv['urls']['owner'] = web_url_for('profile_view_id',
                                                uid=user_settings.owner._primary_key)
-        result['ownerName'] = user_settings.owner.fullname
+        rv['ownerName'] = user_settings.owner.fullname
+        path = node_settings.folder
+        if path is None:
+            rv['folder'] = {'name': None, 'path': None}
+        else:
+            rv['folder'] = {
+                'name': 'Menbib' + path,
+                'path': path
+            }
     return rv

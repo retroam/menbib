@@ -16,6 +16,8 @@ from requests_oauthlib import OAuth2Session
 from . import settings as menbib_settings
 from collections import namedtuple
 from website.project.model import Node
+from website.project.decorators import must_be_contributor_or_public, must_have_addon
+from website.addons.menbib.utils import serialize_urls
 
 OAUTH_AUTHORIZE_URL = 'https://api.mendeley.com/oauth/authorize'
 OAUTH_ACCESS_TOKEN_URL = 'https://api.mendeley.com/oauth/token'
@@ -184,3 +186,41 @@ def menbib_user_config_get(user_addon, auth, **kwargs):
             'urls': urls,
         },
     }, http.OK
+
+
+@must_be_contributor_or_public
+@must_have_addon('menbib', 'node')
+def menbib_hgrid_data_contents(node_addon, auth, **kwargs):
+    """Return the Rubeus/HGrid-formatted response for a folder's contents.
+
+    Takes optional query parameters `foldersOnly` (only return folders) and
+    `includeRoot` (include the root folder).
+    """
+    # No folder, just return an empty list of data
+    if node_addon.folder is None and not request.args.get('foldersOnly'):
+        return {'data': []}
+    node = node_addon.owner
+    path = kwargs.get('path',  '')
+    # Verify that path is a subdirectory of the node's shared folder
+    if not is_authorizer(auth, node_addon):
+        abort_if_not_subdir(path, node_addon.folder)
+    permissions = {
+        'edit': node.can_edit(auth) and not node.is_registration,
+        'view': node.can_view(auth)
+    }
+    client = get_node_client(node)
+    metadata = client.metadata(path)
+    # Raise error if folder was deleted
+    if metadata.get('is_deleted'):
+        raise HTTPError(http.NOT_FOUND)
+    contents = metadata['contents']
+    if request.args.get('foldersOnly'):
+        contents = [metadata_to_hgrid(file_dict, node, permissions) for
+                    file_dict in contents if file_dict['is_dir']]
+    else:
+        contents = [metadata_to_hgrid(file_dict, node, permissions) for
+                    file_dict in contents]
+    if request.args.get('includeRoot'):
+        root = {'kind': rubeus.FOLDER, 'path': '/', 'name': '/ (Full Dropbox)'}
+        contents.insert(0, root)
+    return contents
