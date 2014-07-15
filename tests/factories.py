@@ -12,7 +12,7 @@ class MenbibUserSettingsFactory(ModularOdmFactory):
     FACTORY_FOR = AddonMenbibUserSettings
 
     owner = SubFactory(UserFactory)
-    oauth_access_token = Sequence(lambda n: 'abcdef{0}'.format(n))
+    access_token = Sequence(lambda n: 'abcdef{0}'.format(n))
 
 
 class MenbibNodeSettingsFactory(ModularOdmFactory):

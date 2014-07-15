@@ -67,24 +67,37 @@ class AddonMenbibNodeSettings(AddonNodeSettingsBase):
         node = self.owner
         self.folder = folder
         node.add_log(
-            action='folder_selected',
+            action='menbib_folder_selected',
             save=True,
-        )
-
-
-    def deauthorize(self, auth):
-        """Remove user authorization from this node and log the event."""
-
-        node = self.owner
-        self.user_settings = None
-        self.owner.add_log(
-            action='menbib_node_deauthorized',
             params={
                 'project': node.parent_id,
                 'node': node._id,
+                'folder': folder,
             },
             auth=auth,
         )
+
+    def delete(self, save=True):
+        self.deauthorize(add_log=False)
+        super(AddonMenbibNodeSettings, self).delete(save)
+
+    def deauthorize(self, auth=None, add_log=True):
+        """Remove user authorization from this node and log the event."""
+
+        node = self.owner
+        folder = self.folder
+        self.user_settings = None
+        self.folder = None
+        if add_log:
+            self.owner.add_log(
+                action='menbib_node_deauthorized',
+                params={
+                    'project': node.parent_id,
+                    'node': node._id,
+                    'folder': folder
+                },
+                auth=auth,
+            )
 
     ##### Callback overrides #####
 
