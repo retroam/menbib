@@ -5,7 +5,10 @@
 def serialize_urls(node_settings):
     node = node_settings.owner
     urls = {
-        'config': node.api_url_for('ctmdv_config_put'),
+        'config': node.api_url_for('menbib_config_put'),
+        'deauthorize': node.api_url_for('menbib_deauthorize'),
+        'auth': node.api_url_for('menbib_oauth_start'),
+        'importAuth': node.api_url_for('menbib_import_user_auth')
     }
     return urls
 
