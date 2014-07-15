@@ -2,9 +2,10 @@
 """Persistence layer for the menbib addon.
 """
 
-from modularodm import fields
+
 from website.addons.base import AddonUserSettingsBase, AddonNodeSettingsBase
 from framework.auth import Auth
+from framework import fields
 
 
 class AddonMenbibUserSettings(AddonUserSettingsBase):
@@ -33,7 +34,7 @@ class AddonMenbibUserSettings(AddonUserSettingsBase):
 
     def clear(self):
         self.access_token = None
-        for node_settings in self.addonmenbibnodesettings_authorized:
+        for node_settings in self.addonmenbibnodesettings__authorized:
             node_settings.deauthorize(Auth(self.owner))
             node_settings.save()
         return self
