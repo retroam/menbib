@@ -1,149 +1,36 @@
 """
 
 """
+from website.addons.base.exceptions import AddonError
+from website.addons.menbib.api import Mendeley
 
-import os
-import json
-import base64
-import urllib
-import datetime
+def get_client(user):
+    """Return a :class:`dropbox.client.DropboxClient`, using a user's
+    access token.
 
-import requests
-from requests_oauthlib import OAuth2Session
-from hurry.filesize import size, alternative
-
-from . import settings as mendeley_settings
-
-GH_URL = 'https://mendeley.com/'
-API_URL = 'https://api-oauth2.mendeley.com/oapi/'
-
-
-mendeley_cache = {}
+    :param User user: The user.
+    :raises: AddonError if user does not have the Dropbox addon enabled.
+    """
+    user_settings = user.get_addon('menbib')
+    if not user_settings:
+        raise AddonError('User does not have the Mendeley addon enabled.')
+    return Mendeley(user_settings.access_token, user_settings.refresh_token)
 
 
-class Mendeley(object):
+def get_client_from_user_settings(settings_obj):
+    """Same as get client, except its argument is a AddonMenbibUserSettingsObject."""
+    return get_client(settings_obj.owner)
 
-    def __init__(self, access_token=None, token_type=None):
 
-        self.access_token = access_token
-        self.token_type = token_type
+def get_node_client(node):
+    node_settings = node.get_addon('menbib')
+    return get_node_addon_client(node_settings)
 
-        if access_token and token_type:
-            self.session = OAuth2Session(
-                mendeley_settings.CLIENT_ID,
-                token={
-                    'access_token': access_token,
-                    'token_type': token_type,
-                }
-            )
+
+def get_node_addon_client(node_addon):
+    if node_addon:
+        if node_addon.has_auth:
+            return get_client_from_user_settings(node_addon.user_settings)
         else:
-            self.session = requests
-
-    @classmethod
-    def from_settings(cls, settings):
-        if settings:
-            return cls(
-                access_token=settings.oauth_access_token,
-                token_type=settings.oauth_token_type,
-            )
-        return cls()
-
-    def _send(self, url, method='get', output='json', cache=True, **kwargs):
-        """
-
-        """
-        func = getattr(self.session, method.lower())
-        # Add if-modified-since header if needed
-        headers = kwargs.pop('headers', {})
-        cache_key = '{0}::{1}::{2}'.format(
-            url, method, str(kwargs)
-        )
-        cache_data = mendeley_cache.get(cache_key)
-        if cache and cache_data:
-            if 'if-modified-since' not in headers:
-                headers['if-modified-since'] = cache_data['date'].strftime('%c')
-
-        # Send request
-        req = func(url, headers=headers, **kwargs)
-
-        # Pull from cache if not modified
-        if cache and cache_data and req.status_code == 304:
-            return cache_data['data']
-
-        # Get return value
-
-        if 200 <= req.status_code < 300:
-            if output is None:
-                rv = req
-            else:
-                rv = getattr(req, output)
-                if callable(rv):
-                    rv = rv()
-
-        # Cache return value if needed
-        if cache and rv:
-            if req.headers.get('last-modified'):
-                mendeley_cache[cache_key] = {
-                    'data': rv,
-                    'date': datetime.datetime.utcnow(),
-                }
-
-        return rv
-
-    def user(self, user=None):
-        """Fetch a user or the authenticated user.
-
-        :param user: Optional Mendeley user name; will fetch authenticated
-            user if omitted
-        :return dict: Mendeley API response
-
-        """
-        url = (
-            os.path.join(API_URL, 'users', user)
-            if user
-            else os.path.join(API_URL, 'profiles','info','me')
-        )
-
-        return self._send(url, cache=False)
-
-    def revoke_token(self):
-
-        if self.access_token is None:
-            return
-        else:
-            self.access_token = None
-
-        return self.access_token
-
-
-    def library(self, user):
-        """Get library from user collection
-        """
-        return self._send(
-            os.path.join(API_URL, 'library')
-        )
-
-    def folders(self, user):
-        """Get folders from user collection
-        """
-        return self._send(
-            os.path.join(API_URL, 'library', 'folders')
-        )
-
-    def folder_details(self, user, folder_id):
-        """Get folders from user collection
-        """
-        return self._send(
-            os.path.join(API_URL, 'library', 'folders', folder_id)
-        )
-
-    def document_details(self, user,doc_id):
-        """Get document details from user collection
-        """
-        return self._send(
-            os.path.join(API_URL, 'library','documents',doc_id)
-        )
-
-
-
-
+            raise AddonError('Node is not authorized')
+    raise AddonError('Node does not have the Mendeley addon enabled.')
