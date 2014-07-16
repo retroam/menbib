@@ -137,4 +137,17 @@ class MockMenbib(object):
             ret = None
         return ret
 
+@contextmanager
+def patch_client(target):
+    """Patches a function that returns a MendeleyClient, returning an instance
+    of MockMenbib instead.
 
+    Usage: ::
+
+        with patch_client('website.addons.dropbox.view.config.get_client') as client:
+            # test view that uses the dropbox client.
+    """
+    with mock.patch(target) as client_getter:
+        client = MockMenbib()
+        client_getter.return_value = client
+        yield client

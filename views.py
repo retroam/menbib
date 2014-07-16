@@ -17,7 +17,10 @@ from . import settings as menbib_settings
 from collections import namedtuple
 from website.project.model import Node
 from website.project.decorators import must_be_contributor_or_public, must_have_addon
-from website.addons.menbib.utils import serialize_urls
+from website.addons.menbib.utils import (serialize_urls, is_authorizer,
+                                         abort_if_not_subdir, metadata_to_hgrid)
+from website.addons.menbib.client import get_node_client
+from website.util import rubeus
 
 OAUTH_AUTHORIZE_URL = 'https://api.mendeley.com/oauth/authorize'
 OAUTH_ACCESS_TOKEN_URL = 'https://api.mendeley.com/oauth/token'
@@ -211,8 +214,6 @@ def menbib_hgrid_data_contents(node_addon, auth, **kwargs):
     client = get_node_client(node)
     metadata = client.metadata(path)
     # Raise error if folder was deleted
-    if metadata.get('is_deleted'):
-        raise HTTPError(http.NOT_FOUND)
     contents = metadata['contents']
     if request.args.get('foldersOnly'):
         contents = [metadata_to_hgrid(file_dict, node, permissions) for
@@ -221,6 +222,6 @@ def menbib_hgrid_data_contents(node_addon, auth, **kwargs):
         contents = [metadata_to_hgrid(file_dict, node, permissions) for
                     file_dict in contents]
     if request.args.get('includeRoot'):
-        root = {'kind': rubeus.FOLDER, 'path': '/', 'name': '/ (Full Dropbox)'}
+        root = {'kind': rubeus.FOLDER, 'path': '/', 'name': '/ (Full Mendeley)'}
         contents.insert(0, root)
     return contents
