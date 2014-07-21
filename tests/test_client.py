@@ -7,7 +7,7 @@ from tests.factories import UserFactory
 from website.addons.base.exceptions import AddonError
 from website.addons.menbib.model import AddonMenbibUserSettings
 from website.addons.menbib.tests.factories import (
-    MenbibNodeSettingsFactory,MenbibUserSettingsFactory)
+    MenbibNodeSettingsFactory, MenbibUserSettingsFactory)
 
 from website.addons.menbib.client import (
     get_client, get_node_addon_client, get_node_client, get_client_from_user_settings

@@ -1,0 +1,17 @@
+
++td {
+ +    font-size: .9em;
+ +}
+ +
+ +.mendeley-options-text {
+ +    font-weight: bold;
+ +    font-size: 1.1em;
+ +}
+ +
+ +.mendeley-options-top {
+ +    margin-bottom: 15px;
+ +}
+ +
+ +.mendeley-item-table-view-row {
+ +    background-color: #ededed;
+ +}

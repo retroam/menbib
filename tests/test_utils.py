@@ -6,7 +6,7 @@ from tests.factories import AuthUserFactory
 from website.util import api_url_for
 
 
-from .utils import app, MenbibAddonTestCase, MockMenbib, patch_client
+from .utils import app, MenbibAddonTestCase, MockMenbib
 from website.addons.menbib.utils import serialize_settings
 
 mock_client = MockMenbib()
@@ -137,18 +137,3 @@ class TestConfigViews(MenbibAddonTestCase):
         assert_equal(log_params['node'], self.project._primary_key)
         assert_equal(last_log.user, self.user)
 
-
-class TestFolderViews(MenbibAddonTestCase):
-
-    # def test_menbib_hgrid_data_contents(self):
-    # with patch_client('website.addons.menbib.views.hgrid.get_node_client'):
-    #     url = api_url_for('menbib_hgrid_data_contents',
-    #         path=self.node_settings.folder,
-    #         pid=self.project._primary_key)
-    #
-    #     res = self.app.get(url, auth=self.user.auth)
-    #     contents = mock_client.metadata('', list=True)['contents']
-    #     assert_equal(len(res.json), len(contents))
-    #     first = res.json[0]
-    #     assert_in('kind', first)
-    #     assert_equal(first['path'], contents[0]['path'])

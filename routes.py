@@ -4,8 +4,8 @@
 
 from framework.routing import Rule, json_renderer
 from website.routes import OsfWebRenderer
+from website.addons.menbib import views
 
-from . import views
 
 settings_routes = {
     'rules': [
@@ -13,7 +13,7 @@ settings_routes = {
         Rule(
             '/settings/menbib/',
             'get',
-            views.menbib_user_config_get,
+            views.auth.menbib_user_config_get,
             json_renderer,
         ),
 
@@ -21,7 +21,7 @@ settings_routes = {
         Rule(
             '/settings/menbib/oauth/',
             'get',
-            views.menbib_oauth_start,  # Use same view func as node oauth start
+            views.auth.menbib_oauth_start,  # Use same view func as node oauth start
             json_renderer,
             endpoint_suffix='_user'          # but add a suffix for url_for
         ),
@@ -29,14 +29,14 @@ settings_routes = {
         Rule(
             '/addons/menbib/oauth/finish/',
             'get',
-            views.menbib_oauth_finish,
+            views.auth.menbib_oauth_finish,
             json_renderer,
         ),
 
         Rule(
             '/settings/menbib/oauth/',
             'delete',
-            views.menbib_oauth_delete_user,
+            views.auth.menbib_oauth_delete_user,
             json_renderer,
         ),
 
@@ -46,7 +46,7 @@ settings_routes = {
                 '/project/<pid>/node/<nid>/menbib/oauth/',
             ],
             'get',
-            views.menbib_oauth_start,
+            views.auth.menbib_oauth_start,
             json_renderer,
         ),
     ],
@@ -65,7 +65,7 @@ api_routes = {
             ['/project/<pid>/menbib/config/',
             '/project/<pid>/node/<nid>/menbib/config/'],
             'get',
-            views.menbib_config_get,
+            views.auth.menbib_config_get,
             json_renderer
         ),
 
@@ -73,7 +73,7 @@ api_routes = {
             ['/project/<pid>/menbib/config/',
             '/project/<pid>/node/<nid>/menbib/config/'],
             'put',
-            views.menbib_config_put,
+            views.auth.menbib_config_put,
             json_renderer
         ),
 
@@ -81,7 +81,7 @@ api_routes = {
             ['/project/<pid>/menbib/config/',
             '/project/<pid>/node/<nid>/menbib/config/'],
             'delete',
-            views.menbib_deauthorize,
+            views.auth.menbib_deauthorize,
             json_renderer
         ),
 
@@ -89,7 +89,7 @@ api_routes = {
             ['/project/<pid>/menbib/config/import-auth/',
             '/project/<pid>/node/<nid>/menbib/config/import-auth/'],
             'put',
-            views.menbib_import_user_auth,
+            views.auth.menbib_import_user_auth,
             json_renderer
         ),
 
@@ -102,8 +102,21 @@ api_routes = {
                 '/project/<pid>/node/<nid>/menbib/hgrid/<path:path>',
             ],
             'get',
-            views.menbib_hgrid_data_contents,
+            views.hgrid.menbib_hgrid_data_contents,
             json_renderer
+        ),
+
+        ##### HGrid #####
+        Rule(
+            [
+                '/project/<pid>/menbib/page/',
+                '/project/<pid>/node/<nid>/menbib/page/',
+                '/project/<pid>/menbib/hgrid/<path:path>',
+                '/project/<pid>/node/<nid>/menbib/page/<path:path>',
+            ],
+            'get',
+            views.page.get_page_info,
+            OsfWebRenderer('../addons/menbib/templates/mendeley_page.mako')
         ),
     ],
 
