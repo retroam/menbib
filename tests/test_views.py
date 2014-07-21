@@ -96,9 +96,10 @@ class TestPageViews(MenbibAddonTestCase):
         user_settings=self.user_settings)
         self.project = self.node_settings.owner
 
-    def test_mendeley_page(self):
-        url = web_url_for('menbib_get_page_info')
+    def test_menbib_page(self):
+        url = web_url_for('menbib_get_page_info', pid=self.project._primary_key)
         print url
+        res = self.app.get(url, auth=self.user.auth)
 
     def test_mendeley_export(self):
         pass

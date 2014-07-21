@@ -68,27 +68,26 @@ class Mendeley(object):
 
         return self.session.get(url)
 
-    # def revoke_token(self):
-    #
-    #     if self.access_token is None:
-    #         return
-    #     else:
-    #         self.access_token = None
-    #
-    #     return self.access_token
-    #
-    # def library(self):
-    #     """Get library from user collection
-    #     """
-    #     return self._send(
-    #         os.path.join(menbib_settings.API_URL, 'library')
-    #     )
+    def revoke_token(self):
+
+        if self.access_token is None:
+            return
+        else:
+            self.access_token = None
+
+        return self.access_token
+
+    def library(self):
+        """Get library from user collection
+        """
+        url = os.path.join(menbib_settings.API_URL, 'library')
+        return self.session.get(url).json()
 
     def folders(self):
         """Get folders from user collection
         """
         url = os.path.join(menbib_settings.API_URL, 'library', 'folders')
-        return self.session.get(url)
+        return self.session.get(url).json()
 
     # def folder_details(self, folder_id):
     #     """Get folders from user collection

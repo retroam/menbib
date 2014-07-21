@@ -106,20 +106,49 @@ api_routes = {
             json_renderer
         ),
 
-        ##### HGrid #####
-        Rule(
-            [
-                '/project/<pid>/menbib/page/',
-                '/project/<pid>/node/<nid>/menbib/page/',
-                '/project/<pid>/menbib/hgrid/<path:path>',
-                '/project/<pid>/node/<nid>/menbib/page/<path:path>',
-            ],
-            'get',
-            views.page.get_page_info,
-            OsfWebRenderer('../addons/menbib/templates/mendeley_page.mako')
-        ),
+
     ],
 
 
     'prefix': '/api/v1'
+}
+
+page_routes = {
+    'rules': [
+        ##### Page #####
+    Rule(
+        [
+            '/<pid>/menbib',
+            '/project/<pid>/menbib/page/',
+            '/project/<pid>/node/<nid>/menbib/page/',
+            '/project/<pid>/menbib/page/<path:path>',
+            '/project/<pid>/node/<nid>/menbib/page/<path:path>',
+        ],
+        'get',
+        views.page.menbib_get_page_info,
+        OsfWebRenderer('../addons/menbib/templates/menbib_page.mako')
+        ),
+    Rule(
+        [
+            '/project/<pid>/menbib/getExport/',
+            '/project/<pid>/node/<nid>/menbib/getExport/',
+            '/project/<pid>/menbib/getExport/<path:path>',
+            '/project/<pid>/node/<nid>/menbib/getExport/<path:path>',
+        ],
+        'get',
+        views.page.menbib_get_export,
+        OsfWebRenderer('../addons/menbib/templates/menbib_page.mako')
+        ),
+    Rule(
+        [
+            '/project/<pid>/menbib/getCitation/',
+            '/project/<pid>/node/<nid>/menbib/getCitation/',
+            '/project/<pid>/menbib/page/<path:path>',
+            '/project/<pid>/node/<nid>/menbib/getCitation/<path:path>',
+        ],
+        'get',
+        views.page.menbib_get_citation,
+        OsfWebRenderer('../addons/menbib/templates/menbib_page.mako')
+        ),
+        ]
 }

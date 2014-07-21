@@ -6,6 +6,7 @@ from website.project.decorators import must_be_contributor_or_public
 from website.project.decorators import must_have_addon
 from website.project.views.node import _view_project
 from website.addons.menbib.api import Mendeley
+from website.addons.menbib.client import get_node_addon_client
 from citeproc import CitationStylesStyle, CitationStylesBibliography
 from citeproc import Citation, CitationItem
 from citeproc import formatter
@@ -13,6 +14,8 @@ from citeproc.source.json import CiteProcJSON
 from flask import send_file
 import StringIO
 from website.addons.menbib import settings as menbib_settings
+from framework.status import push_status_message as flash
+from flask import redirect
 
 
 def parse_library(connect, menbib):
@@ -101,32 +104,20 @@ def _get_citation(library, document_id, style):
 
 @must_be_contributor_or_public
 @must_have_addon('menbib', 'node')
-def get_page_info(*args, **kwargs):
+def menbib_get_page_info(node_addon, auth, **kwargs):
 
     folder = request.args.get('folder')
 
-    user = kwargs['auth']
-    node = kwargs['node'] or kwargs['project']
-    menbib = kwargs['node_addon']
-    menbib_user = user.user.get_addon('menbib')
+    if node_addon.user_settings is None:
+        flash('Authorize Mendeley add-on in Settings', 'warning')
+        raise HTTPError(http.FORBIDDEN)
 
 
-    code = request.args.get('code')
-
-    token = oauth_refresh_token(menbib_user.oauth_refresh_token,
-                                code,
-                                user.user,
-                               menbib_user.oauth_token_expires,
-                               menbib_user.oauth_token,)
-
-    menbib_user.oauth_access_token = token['access_token']
-    menbib_user.oauth_refresh_token = token['refresh_token']
-    menbib_user.oauth_token_type = token['token_type']
-    menbib_user.oauth_token_expires = token['expires_in']
-
-    connect = Mendeley.from_settings(menbib.user_settings)
-    user_library = connect.library(menbib.user_settings)
-    user_folders = connect.folders(menbib.user_settings)
+    user_settings = node_addon.user_settings
+    client = get_node_addon_client(node_addon)
+    client.from_settings(user_settings)
+    user_folders = client.folders()
+    user_library = client.library()
     user_folders_id = []
     user_folders_name = []
 
@@ -203,7 +194,7 @@ def get_page_info(*args, **kwargs):
 
 @must_be_contributor_or_public
 @must_have_addon('menbib', 'node')
-def menbib_export(*args, **kwargs):
+def menbib_get_export(*args, **kwargs):
 
 
     user = kwargs['auth']
@@ -242,7 +233,7 @@ def menbib_export(*args, **kwargs):
 
 @must_be_contributor_or_public
 @must_have_addon('menbib', 'node')
-def menbib_citation(*args, **kwargs):
+def menbib_get_citation(*args, **kwargs):
 
 
     user = kwargs['auth']
