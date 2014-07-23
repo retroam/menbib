@@ -23,10 +23,10 @@ class AddonMenbibUserSettings(AddonUserSettingsBase):
     def has_auth(self):
         return bool(self.access_token)
 
-    # def to_json(self, user=None):
-    #     output = super(AddonMenbibUserSettings, self).to_json(self.owner)
-    #     output['has_auth'] = self.has_auth
-    #     return output
+    def to_json(self, user=None):
+        output = super(AddonMenbibUserSettings, self).to_json(self.owner)
+        output['has_auth'] = self.has_auth
+        return output
 
     def delete(self, save=True):
         self.clear()

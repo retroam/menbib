@@ -18,20 +18,18 @@ def menbib_hgrid_data_contents(node_addon, auth, **kwargs):
     if node_addon.folder is None and not request.args.get('foldersOnly'):
         return {'data': []}
 
-
-
-    permissions = {
-        'edit': node.can_edit(auth) and not node.is_registration,
-        'view': node.can_view(auth)
-    }
-    client = get_node_client(node)
-    folders = client.folders()
-    if request.args.get('foldersOnly'):
-        contents = [folder_to_hgrid(folder, node, permissions) for
-                    folder in folders]
-    # TODO: In the future display folder contents?
-    else:
-        contents = [folder_to_hgrid(folder, node, permissions) for
-                    folder in folders]
-
-    return contents
+    # permissions = {
+    #     'edit': node.can_edit(auth) and not node.is_registration,
+    #     'view': node.can_view(auth)
+    # }
+    # client = get_node_client(node)
+    # folders = client.folders()
+    # if request.args.get('foldersOnly'):
+    #     contents = [folder_to_hgrid(folder, node, permissions) for
+    #                 folder in folders]
+    # # TODO: In the future display folder contents?
+    # else:
+    #     contents = [folder_to_hgrid(folder, node, permissions) for
+    #                 folder in folders]
+    #
+    # return contents

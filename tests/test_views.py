@@ -3,7 +3,7 @@ from webtest_plus import TestApp
 from nose.tools import *  # PEP8 asserts
 import mock
 from tests.base import OsfTestCase, URLLookup, assert_is_redirect
-from tests.factories import AuthUserFactory, ProjectFactory
+from tests.factories import AuthUserFactory, ProjectFactory, UserFactory
 from website.util import api_url_for, web_url_for
 from collections import namedtuple
 
@@ -51,25 +51,29 @@ class TestMenbibAuthViews(OsfTestCase):
 
 class TestFolderViews(MenbibAddonTestCase):
 
-    def setUp(self):
-        self.app = TestApp(app)
-        self.user = AuthUserFactory()
-        self.app.authenticate(*self.user.auth)
-        self.user_settings = self.user.get_addon('menbib')
-        self.node_settings = MenbibNodeSettingsFactory(
-            user_settings=self.user_settings)
-        self.project = self.node_settings.owner
+    # def setUp(self):
+    #     self.app = TestApp
+    #     self.user = AuthUserFactory()
+    #     self.user.add_addon('menbib')
+    #     self.user.save()
+    #     self.user_settings = self.user.get_addon('menbib')
+    #     self.project = ProjectFactory()
+    #     self.node_settings = MenbibNodeSettingsFactory(
+    #         user_settings=self.user_settings,
+    #         owner=self.project
+    #     )
 
-    # def test_menbib_hgrid_data_contents_if_folder_is_none(self):
-    #     # If folder is set to none, no data are returned
-    #     print self.node_settings.folder
-    #     self.node_settings.folder = None
-    #     self.node_settings.save()
-    #     print self.node_settings.folder
-    #     url = api_url_for('menbib_hgrid_data_contents', pid=self.project._primary_key)
-    #     res = self.app.get(url, auth=self.user.auth)
-    #     print res.json()
-    #     # assert_equal(res.json['data'], [])
+    def test_menbib_hgrid_data_contents_if_folder_is_none(self):
+        # If folder is set to none, no data are returned
+        print self.node_settings.folder
+        self.node_settings.folder = None
+        self.node_settings.save()
+        print self.node_settings.folder
+        url = api_url_for('menbib_hgrid_data_contents', pid=self.project._primary_key)
+        print self.user.auth
+        res = self.app.get(url, auth=self.user.auth)
+        # print res.json()
+        # assert_equal(res.json['data'], [])
 
     # def test_menbib_hgrid_data_contents(self):
     #     with patch_client('website.addons.menbib.views.get_node_client'):
@@ -85,24 +89,24 @@ class TestFolderViews(MenbibAddonTestCase):
 
 
 
-class TestPageViews(MenbibAddonTestCase):
-
-    def setUp(self):
-        self.app = TestApp(app)
-        self.user = AuthUserFactory()
-        self.app.authenticate(*self.user.auth)
-        self.user_settings = self.user.get_addon('menbib')
-        self.node_settings = MenbibNodeSettingsFactory(
-        user_settings=self.user_settings)
-        self.project = self.node_settings.owner
-
-    def test_menbib_page(self):
-        url = web_url_for('menbib_get_page_info', pid=self.project._primary_key)
-        print url
-        res = self.app.get(url, auth=self.user.auth)
-
-    def test_mendeley_export(self):
-        pass
-
-    def test_mendeley_citation(self):
-        pass
+# class TestPageViews(MenbibAddonTestCase):
+#
+#     def setUp(self):
+#         self.app = TestApp(app)
+#         self.user = AuthUserFactory()
+#         self.app.authenticate(*self.user.auth)
+#         self.user_settings = self.user.get_addon('menbib')
+#         self.node_settings = MenbibNodeSettingsFactory(
+#         user_settings=self.user_settings)
+#         self.project = self.node_settings.owner
+#
+#     def test_menbib_page(self):
+#         url = web_url_for('menbib_get_page_info', pid=self.project._primary_key)
+#         print url
+#         #res = self.app.get(url, auth=self.user.auth)
+#
+#     def test_mendeley_export(self):
+#         pass
+#
+#     def test_mendeley_citation(self):
+#         pass

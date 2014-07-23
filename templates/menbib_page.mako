@@ -27,20 +27,20 @@
    <div class="container">
 
            <script>
-            function getCitationURL(){
-                return "${api_url}mendeley/getCitation/"
+            function getmenbibCitationURL(){
+                return "${api_url}menbib/getCitation/"
             }
             function getExportBaseURL(){
-                return "${api_url}mendeley/getExport/"
+                return "${api_url}menbib/getExport/"
             }
             </script>
 
-<div class="row mendeley-options-top">
+<div class="row menbib-options-top">
 
-                <a href="${api_url}mendeley" type="button" class="btn btn-default"><span class="glyphicon glyphicon-home"></span>&nbsp; All Items</a>
+                <a href="${api_url}menbib" type="button" class="btn btn-default"><span class="glyphicon glyphicon-home"></span>&nbsp; All Items</a>
 
-                <form role="form" id="mendeleyCollectionForm" style="display: inline;">
-                    <input type="hidden" id="mendeleyCollectionName" name="folder" value="">
+                <form role="form" id="menbibCollectionForm" style="display: inline;">
+                    <input type="hidden" id="menbibCollectionName" name="folder" value="">
                     <div class="btn-group">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                           <span class="glyphicon glyphicon-list"></span>&nbsp; Folders
@@ -49,7 +49,7 @@
                         <ul class="dropdown-menu" role="menu">
                         % if len(folder_names) > 0:
                             % for name in folder_names:
-                                <li onclick="$('#mendeleyCollectionName').val('${name}');$('#mendeleyCollectionForm').submit()">
+                                <li onclick="$('#menbibCollectionName').val('${name}');$('#menbibCollectionForm').submit()">
                                     <a href="#">${name}</a>
                                 </li>
                             % endfor
@@ -70,7 +70,7 @@
                     </button>
                     <ul class="dropdown-menu" role="menu">
                         % for style in citation_styles:
-                            <li><a href="#" onclick="createCitation('${style}')">${style}</a></li>
+                            <li><a href="#" onclick="createmenbibCitation('${style}')">${style}</a></li>
                         % endfor
                     </ul>
                 </div>
@@ -95,7 +95,7 @@
 
     <table class="table table-bordered table-striped" id="all-items-table">
         <tr>
-            <td class="mendeley-item-table-view-row" colspan="2"></td>
+            <td class="menbib-item-table-view-row" colspan="2"></td>
         </tr>
         <tr>
             <td><input type="checkbox" name="select-all" id="select-all-checkbox"></td>

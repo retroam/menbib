@@ -2,7 +2,7 @@ $(document).ready( function() {
 
     $('#select-all-checkbox').change(function(){
         if(this.checked){
-            $('#all-items-table').find(':checkbox').attr('checked','checked');
+            $('#all-items-table').find(':checkbox').prop('checked','checked');
         }
         else {
             $('#all-items-table').find(':checkbox').removeAttr('checked')
@@ -11,14 +11,14 @@ $(document).ready( function() {
     )
 
 }
-)
+);
 
-function createCitation(citationStyle){
+function createmenbibCitation(citationStyle){
     selectedKeys = getSelectedKeys()
 
     $.ajax({
         type: 'POST',
-        url: getCitationURL(),
+        url: getmenbibCitationURL(),
         data: JSON.stringify({allKeys : selectedKeys, style : citationStyle}),
         contentType: 'application/json',
         dataType: 'json',

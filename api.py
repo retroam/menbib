@@ -50,6 +50,16 @@ class Mendeley(object):
             )
         return cls()
 
+    def refresh_access_token(self):
+        token = self.session.refresh_token(
+            menbib_settings.OAUTH_ACCESS_TOKEN_URL,
+            client_secret=menbib_settings.CLIENT_SECRET,
+            client_id=menbib_settings.CLIENT_ID,
+            refresh_token=self.refresh_token,
+            code=self.access_token)
+        self.access_token = token['access_token']
+        self.refresh_token = token['refresh_token']
+
 
 
     def user(self, user=None):
@@ -89,26 +99,19 @@ class Mendeley(object):
         url = os.path.join(menbib_settings.API_URL, 'library', 'folders')
         return self.session.get(url).json()
 
-    # def folder_details(self, folder_id):
-    #     """Get folders from user collection
-    #     """
-    #     return self._send(
-    #         os.path.join(menbib_settings.API_URL, 'library', 'folders', folder_id)
-    #     )
-    #
-    # def document_details(self, doc_id):
-    #     """Get document details from user collection
-    #     """
-    #     return self._send(
-    #         os.path.join(menbib_settings.API_URL, 'library', 'documents', doc_id)
-    #     )
+    def folder_details(self, folder_id):
+        """Get folders from user collection
+        """
+        url = os.path.join(menbib_settings.API_URL, 'library', 'folders', folder_id)
+        return self.session.get(url).json()
 
-    # def get_folders(self):
-    #     pass
-    #
-    #
-    # def get_folder_contents(self):
-    #     pass
+
+    def document_details(self, doc_id):
+        """Get document details from user collection
+        """
+        url = os.path.join(menbib_settings.API_URL, 'library', 'documents', doc_id)
+        return self.session.get(url).json()
+
     #
     # def parse_library(connect, mendeley):
     #

@@ -18,6 +18,40 @@ from framework.status import push_status_message as flash
 from flask import redirect
 
 
+def _page_content(node, node_addon):
+    """Return the info to be rendered for a library..
+    """
+    #
+    # Check permissions if authorized
+    has_access = False
+    has_auth = bool(node_addon.user_settings and node_addon.user_settings.has_auth)
+    if has_auth:
+        has_access = True
+
+    collection = ""
+    view_string = "All Items"
+    collection_names = []
+    items = []
+    error_statement = ""
+    CITATION_STYLES = ""
+    EXPORT_FORMAT = ""
+
+    return {
+        'complete': True,
+        'gh_user': node_addon.owner,
+        'view_string': view_string,
+        'collection_names':collection_names,
+        'citation_styles': CITATION_STYLES,
+        'export_formats':EXPORT_FORMAT,
+        'error_statement': error_statement,
+        'items': items,
+        'collection':collection,
+        'has_auth': has_auth,
+        'has_access': has_access,
+        'api_url': node.url,
+
+    }
+
 def parse_library(connect, menbib):
 
     user_library = connect.library(menbib.user_settings)
@@ -111,11 +145,11 @@ def menbib_get_page_info(node_addon, auth, **kwargs):
     if node_addon.user_settings is None:
         flash('Authorize Mendeley add-on in Settings', 'warning')
         raise HTTPError(http.FORBIDDEN)
-
-
+    node = node_addon.owner
     user_settings = node_addon.user_settings
     client = get_node_addon_client(node_addon)
     client.from_settings(user_settings)
+    client.refresh_access_token()
     user_folders = client.folders()
     user_library = client.library()
     user_folders_id = []
@@ -125,9 +159,9 @@ def menbib_get_page_info(node_addon, auth, **kwargs):
         user_folders_id.append(user_folders[idx]['id'])
         user_folders_name.append(user_folders[idx]['name'])
 
-    if folder != None:
+    if folder is not None:
         idx = user_folders_name.index(folder)
-        folder_documentId = connect.folder_details(menbib.user_settings, user_folders_id[idx])
+        folder_documentId = client.folder_details(user_folders_id[idx])
         documentId = folder_documentId['document_ids']
     else:
         documentId = user_library['document_ids']
@@ -135,7 +169,7 @@ def menbib_get_page_info(node_addon, auth, **kwargs):
     doc_meta = []
 
     for idx in range(0, len(documentId)):
-        meta = connect.document_details(menbib.user_settings, documentId[idx])
+        meta = client.document_details(documentId[idx])
         author = []
         second_line = ''
         for idy in range(0,len(meta['authors'])):
@@ -176,37 +210,35 @@ def menbib_get_page_info(node_addon, auth, **kwargs):
             "third_line": third_line.replace('()', '').strip(' p. '),
              })
 
-    data = _view_project(node, user, primary=True)
+    data = _view_project(node, auth, primary=True)
 
-    rv = _page_content(node, menbib)
+    rv = _page_content(node, node_addon)
     rv.update({
-        'addon_page_js': menbib_user.config.include_js.get('page'),
-        'addon_page_css': menbib_user.config.include_css.get('page'),
+        'addon_page_js': user_settings.config.include_js.get('page'),
+        'addon_page_css': user_settings.config.include_css.get('page'),
         'items': doc_meta,
         'citation_styles': menbib_settings.CITATION_STYLES,
         'export_formats': menbib_settings.EXPORT_FORMATS,
         'folder_names': user_folders_name,
     })
-    rv.update(menbib_user.config.to_json())
+    rv.update(user_settings.config.to_json())
     rv.update(data)
 
     return rv
 
 @must_be_contributor_or_public
 @must_have_addon('menbib', 'node')
-def menbib_get_export(*args, **kwargs):
+def menbib_get_export(node_addon, *args, **kwargs):
 
+    node = node_addon.owner
+    user_settings = node_addon.user_settings
+    client = get_node_addon_client(node_addon)
+    client.from_settings(user_settings)
+    client.refresh_access_token()
 
-    user = kwargs['auth']
-    node = kwargs['node'] or kwargs['project']
-    menbib = kwargs['node_addon']
-    menbib_node = node.get_addon('menbib')
-    menbib_user = user.user.get_addon('menbib')
+    library = client.library()
 
-    library_connect = _connect_to_library(menbib_user, menbib, user)
-    library = parse_library(library_connect, menbib)
-
-    if menbib_node:
+    if node:
 
         keys = request.args.getlist('allKeys')
         format = request.args.get('format')
@@ -221,7 +253,6 @@ def menbib_get_export(*args, **kwargs):
         else:
             export = 'No Items specified'
 
-
         strIO = StringIO.StringIO()
         strIO.write(str(export))
         strIO.seek(0)
@@ -233,20 +264,17 @@ def menbib_get_export(*args, **kwargs):
 
 @must_be_contributor_or_public
 @must_have_addon('menbib', 'node')
-def menbib_get_citation(*args, **kwargs):
+def menbib_get_citation(node_addon, *args, **kwargs):
 
+    node = node_addon.owner
+    user_settings = node_addon.user_settings
+    client = get_node_addon_client(node_addon)
+    client.from_settings(user_settings)
+    client.refresh_access_token()
 
-    user = kwargs['auth']
-    node = kwargs['node'] or kwargs['project']
-    menbib = kwargs['node_addon']
-    menbib_node = node.get_addon('menbib')
-    menbib_user = user.user.get_addon('menbib')
+    library = client.library()
 
-    library_connect = _connect_to_library(menbib_user, menbib, user)
-    library = parse_library(library_connect, menbib)
-
-
-    if menbib_node:
+    if node:
         keys = request.json.get('allKeys')
         style = request.json.get('style')
 

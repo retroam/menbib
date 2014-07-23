@@ -64,7 +64,6 @@ class TestUserSettingsModel(OsfTestCase):
     def test_to_json(self):
         user_settings = MenbibUserSettingsFactory()
         result = user_settings.to_json()
-        print result
         assert_equal(result['has_auth'], user_settings.has_auth)
 
 

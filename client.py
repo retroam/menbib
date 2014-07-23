@@ -11,7 +11,7 @@ def get_client(user):
     :param User user: The user.
     :raises: AddonError if user does not have the Dropbox addon enabled.
     """
-    user.add_addon('menbib')
+    #user.add_addon('menbib')
     user_settings = user.get_addon('menbib')
 
     if not user_settings:

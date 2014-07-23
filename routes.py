@@ -146,9 +146,8 @@ page_routes = {
             '/project/<pid>/menbib/page/<path:path>',
             '/project/<pid>/node/<nid>/menbib/getCitation/<path:path>',
         ],
-        'get',
-        views.page.menbib_get_citation,
-        OsfWebRenderer('../addons/menbib/templates/menbib_page.mako')
+        'post',
+        views.page.menbib_get_citation,json_renderer
         ),
         ]
 }
