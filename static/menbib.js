@@ -23,12 +23,12 @@ function createmenbibCitation(citationStyle){
         contentType: 'application/json',
         dataType: 'json',
         success: function(data) {
-            displayCitations(data, citationStyle)
+            displaymenbibCitations(data, citationStyle)
         }
     });
 }
 
-function displayCitations(citationText, citationStyle){
+function displaymenbibCitations(citationText, citationStyle){
     $('#citationModalTitle').html('Citations in \<i\>' + citationStyle + '\</i\> Style')
     $('#citationModalBody').html(citationText)
     $('#citationModal').modal('show')
@@ -47,14 +47,14 @@ function getSelectedKeys(){
     return selectedKeys;
 }
 
-function exportItems(format){
+function exportmenbibItems(format){
     selectedKeys = getSelectedKeys()
 
     var key_string = encodeURIComponent(selectedKeys.join())
 
     $.ajax({
         type: 'POST',
-        url: getExportBaseURL(),
+        url: getmenbibExportBaseURL(),
         data: JSON.stringify({allKeys : selectedKeys, format : format}),
         contentType: 'application/json',
         dataType: 'json',
@@ -64,10 +64,10 @@ function exportItems(format){
     });
 }
 
-function getExportURL(format){
+function getmenbibExportURL(format){
     selectedKeys = getSelectedKeys()
 
-    var baseURL = getExportBaseURL()
+    var baseURL = getmenbibExportBaseURL()
 
     baseURL += '?format='+format;
 

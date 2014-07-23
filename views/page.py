@@ -52,13 +52,13 @@ def _page_content(node, node_addon):
 
     }
 
-def parse_library(connect, menbib):
+def parse_library(client):
 
-    user_library = connect.library(menbib.user_settings)
+    user_library = client.library()
     document_id = user_library['document_ids']
     doc_meta = []
     for idx in range(0, len(document_id)):
-        meta = connect.document_details(menbib.user_settings, document_id[idx])
+        meta = client.document_details(document_id[idx])
         date_parts = []
 
         if meta.get('year', '0') != 0:
@@ -236,7 +236,8 @@ def menbib_get_export(node_addon, *args, **kwargs):
     client.from_settings(user_settings)
     client.refresh_access_token()
 
-    library = client.library()
+    library = parse_library(client)
+
 
     if node:
 
@@ -272,7 +273,7 @@ def menbib_get_citation(node_addon, *args, **kwargs):
     client.from_settings(user_settings)
     client.refresh_access_token()
 
-    library = client.library()
+    library = parse_library(client)
 
     if node:
         keys = request.json.get('allKeys')

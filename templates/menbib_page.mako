@@ -30,7 +30,7 @@
             function getmenbibCitationURL(){
                 return "${api_url}menbib/getCitation/"
             }
-            function getExportBaseURL(){
+            function getmenbibExportBaseURL(){
                 return "${api_url}menbib/getExport/"
             }
             </script>
@@ -82,7 +82,7 @@
                     </button>
                     <ul class="dropdown-menu" role="menu">
                         % for format in export_formats:
-                            <li><a href="#" onclick="window.open(getExportURL('${format}'), '_blank')">${format}</a></li>
+                            <li><a href="#" onclick="window.open(getmenbibExportURL('${format}'), '_blank')">${format}</a></li>
                         % endfor
                     </ul>
                 </div>
